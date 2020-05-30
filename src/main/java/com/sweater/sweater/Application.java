@@ -1,4 +1,4 @@
-package com.sweater.hello;
+package com.sweater.sweater;
 
 
 import org.springframework.boot.SpringApplication;
