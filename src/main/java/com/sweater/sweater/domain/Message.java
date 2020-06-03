@@ -28,6 +28,8 @@ public class Message {
     private User author;
 
     public String getAuthorName() {
-        return author == null ? "<none>" : author.getUsername();
+        return author == null ? "\"none\"" : author.getUsername();
     }
+
+    private String filename;
 }
