@@ -10,8 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -33,8 +32,9 @@ public class UserService implements UserDetailsService {
             return false;
         }
 
-        user.setActive(true);
+        user.setActive(false);
         user.setRoles(Collections.singleton(Role.USER));
+        //user.setRoles(new HashSet<Role>(Arrays.asList(new Role[]{Role.ADMIN, Role.USER})));
         user.setActivationCode(UUID.randomUUID().toString());
         userRepository.save(user);
 
@@ -53,12 +53,13 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean activateUser(String code) {
-        User user = userRepository.findByActivationCode();
-        if(user == null){
+        User user = userRepository.findByActivationCode(code);
+        if (user == null) {
             return false;
         }
 
         user.setActivationCode(null);
+        user.setActive(true);
         userRepository.save(user);
         return true;
     }

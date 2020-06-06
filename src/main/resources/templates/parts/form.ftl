@@ -32,7 +32,19 @@
 
 <#macro logout >
     <form action="/logout" method="post">
-        <button type="submit" class="btn btn-primary">Sign Out</button>
+        <button type="submit" class="btn btn-primary mr-3">Sign Out</button>
         <div><input type="hidden" name="_csrf" value="${_csrf.token}"></div>
+    </form>
+</#macro>
+
+<#macro signin >
+    <form action="/login" method="get">
+        <button type="submit" class="btn btn-primary mr-3">Sign in</button>
+    </form>
+</#macro>
+
+<#macro register >
+    <form action="/registration" method="get">
+        <button type="submit" class="btn btn-primary">Register</button>
     </form>
 </#macro>

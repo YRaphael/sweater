@@ -9,7 +9,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto" >
+        <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
                 <a class="nav-link" href="/">Home</a>
             </li>
@@ -17,17 +17,27 @@
                 <a class="nav-link" href="/main">Messages</a>
             </li>
             <#if isAdmin>
-            <li class="nav-item active">
-                <a class="nav-link" href="/user">User list</a>
-            </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/user">User list</a>
+                </li>
             </#if>
         </ul>
 
         <div class="navbar-text mr-3">
             ${name!}
         </div>
+
+        <#if known>
+            <div>
+                <@f.logout />
+            </div>
+        <#else >
+            <div>
+                <@f.signin />
+            </div>
+        </#if>
         <div>
-            <@f.logout />
+            <@f.register />
         </div>
     </div>
 </nav>
