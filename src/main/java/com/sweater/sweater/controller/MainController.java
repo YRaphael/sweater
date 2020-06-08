@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -44,31 +47,39 @@ public class MainController {
         return "main";
     }
 
+
+    //если поменять порядок, то отказывается работать
     @PostMapping("/main")
     public String add(@AuthenticationPrincipal User user,
-                      @RequestParam String text,
-                      @RequestParam String tag,
+                      @Valid Message message,
+                      BindingResult bindingResult,
                       @RequestParam MultipartFile multipartFile,
-                      Map<String, Object> model) throws IOException {
-        Message message = new Message(text, tag, user);
-        if (multipartFile != null && !multipartFile.getOriginalFilename().isEmpty()) {
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
+                      Model model
+                      ) throws IOException {
+        message.setAuthor(user);
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
+            model.mergeAttributes(errorsMap);
+            model.addAttribute("message", message);
+        } else {
+            if (multipartFile != null && !multipartFile.getOriginalFilename().isEmpty()) {
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdir();
+                }
+
+                String uuid = UUID.randomUUID().toString();
+                String uuidFile = uuid + multipartFile.getOriginalFilename();
+
+                multipartFile.transferTo(new File(uploadPath + "/" + uuidFile));
+
+                message.setFilename(uuidFile);
             }
-
-            String uuid = UUID.randomUUID().toString();
-            String uuidFile = uuid + multipartFile.getOriginalFilename();
-
-            multipartFile.transferTo( new File(uploadPath + "/" + uuidFile));
-
-            message.setFilename(uuidFile);
+            model.addAttribute("message", null);
+            messageRepository.save(message);
         }
-
-        messageRepository.save(message);
-
         Iterable<Message> all = messageRepository.findAll();
-        model.put("messages", all);
+        model.addAttribute("messages", all);
         return "main";
     }
 }

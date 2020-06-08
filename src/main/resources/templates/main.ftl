@@ -16,13 +16,29 @@
             aria-expanded="false" aria-controls="collapseExample">
         Add new message
     </button>
-    <div class="collapse form-group mt-3" id="collapseExample">
+    <div class="collapse form-group mt-3 <#if message??>show</#if>" id="collapseExample">
         <form method="post" action="/main" enctype="multipart/form-data">
             <div class="form-group">
-                <input class="form-control" type="text" name="text" placeholder="Message">
+                <input class="form-control ${(textError??)?string('is-invalid', '')}"
+                       value="<#if message??>${message.text}</#if>"
+                       type="text" name="text"
+                       placeholder="Message">
+                <#if textError??>
+                    <div class="invalid-feedback">
+                        ${textError}
+                    </div>
+                </#if>
             </div>
             <div class="form-group">
-                <input class="form-control" type="text" name="tag" placeholder="Tag">
+                <input class="form-control ${(tagError??)?string('is-invalid', '')}"
+                       type="text" name="tag"
+                       placeholder="Tag"
+                       value="<#if message??>${message.tag}</#if>">
+                <#if tagError??>
+                    <div class="invalid-feedback">
+                        ${tagError}
+                    </div>
+                </#if>
             </div>
             <div class="form-group">
                 <div class="custom-file">
@@ -39,7 +55,7 @@
 
     <div class="card-columns">
         <#list messages as message>
-            <div class="card my-3" >
+            <div class="card my-3">
                 <div>
                     <#if message.filename??>
                         <img src="/img/${message.filename}" class="card-img-top">
