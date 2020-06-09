@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -27,7 +28,11 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username);
+        User byUsername = userRepository.findByUsername(username);
+        if (byUsername == null) {
+            throw new UsernameNotFoundException("User not found.");
+        }
+        return byUsername;
     }
 
     public boolean addUser(User user) {
@@ -93,9 +98,22 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void updateProfile(User user, String password, String email) {
+    public boolean updateProfile(User user, String password, String password2, String email, Model model) {
+        if (password == null || StringUtils.isEmpty(password)) {
+            model.addAttribute("passwordError", "Password can't be empty. Changes not save.");
+            return false;
+        }
+        if (password2 == null || StringUtils.isEmpty(password2)) {
+            model.addAttribute("password2Error", "Password confirm can't be empty. Changes not save.");
+            return false;
+        }
+        if (!password.equals(password2)) {
+            model.addAttribute("passwordError", "Password and password confirm must be equal. Changes not save.");
+            return false;
+        }
+        user.setPassword2(password2);
         String userEmail = user.getEmail();
-        boolean isEmailChanged = (email != null && !email.equals(userEmail)) || (userEmail != null && !userEmail.equals(email));
+        boolean isEmailChanged = ((email != null && !email.equals(userEmail)) || (userEmail != null && !userEmail.equals(email))) && !StringUtils.isEmpty(email);
         if (isEmailChanged) {
             user.setEmail(email);
             if (!StringUtils.isEmpty(email)) {
@@ -104,11 +122,12 @@ public class UserService implements UserDetailsService {
             }
         }
         if (!StringUtils.isEmpty(password)) {
-            user.setPassword(password);
+            user.setPassword(passwordEncoder.encode(password));
         }
         userRepository.save(user);
         if (isEmailChanged) {
             sendMail(user);
         }
+        return true;
     }
 }

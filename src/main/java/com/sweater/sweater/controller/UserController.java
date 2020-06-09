@@ -54,8 +54,12 @@ public class UserController {
     }
 
     @PostMapping("profile")
-    public String editProfile(Model model, @AuthenticationPrincipal User user, @RequestParam String password, @RequestParam String email) {
-        userService.updateProfile(user, password, email);
+    public String editProfile(Model model, @AuthenticationPrincipal User user, @RequestParam String password, @RequestParam String password2, @RequestParam String email) {
+        boolean isEdited = userService.updateProfile(user, password, password2, email, model);
+        model.addAttribute("username",user.getUsername());
+        if (!isEdited){
+            return "profile";
+        }
         return "redirect:/user/profile";
     }
 }
