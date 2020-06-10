@@ -55,6 +55,14 @@
                 </div>
             </div>
         </#if>
+        <div class = "col-sm-6">
+            <div class="g-recaptcha" data-sitekey="6Lc786IZAAAAAHO5hqVL98PGoKst_QK8peWgsuLY"></div>
+            <#if captchaError??>
+                <div class="alert alert-$danger" role="alert">
+                    ${captchaError}
+                </div>
+            </#if>
+        </div>
         <div><input type="hidden" name="_csrf" value="${_csrf.token}"></div>
         <div>
             <button class="btn btn-primary" type="submit"/><#if path == "/login">Login<#else>Sign Up</#if></button>
