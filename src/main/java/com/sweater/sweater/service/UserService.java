@@ -111,7 +111,7 @@ public class UserService implements UserDetailsService {
             model.addAttribute("passwordError", "Password and password confirm must be equal. Changes not save.");
             return false;
         }
-        user.setPassword2(password2);
+
         String userEmail = user.getEmail();
         boolean isEmailChanged = ((email != null && !email.equals(userEmail)) || (userEmail != null && !userEmail.equals(email))) && !StringUtils.isEmpty(email);
         if (isEmailChanged) {
